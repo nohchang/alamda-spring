@@ -3,10 +3,11 @@ package aladma.alamdaspring.service;
 import aladma.alamdaspring.domain.User;
 import aladma.alamdaspring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,8 +21,8 @@ public class UserService {
 
         validateDuplicateUser(user);
 
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        User.builder().password(encoder.encode(user.getPassword()));
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        User.builder().password(encoder.encode(user.getPassword()));
 
         userRepository.save(user);
         return user.getId();
@@ -42,5 +43,9 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+    }
+
+    public List<User> findUsers() {
+        return userRepository.findAll();
     }
 }

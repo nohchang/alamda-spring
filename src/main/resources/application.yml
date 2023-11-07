@@ -16,11 +16,15 @@ spring:
     org.hibernate.SQL: debug
 
   #Google
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          google:
-#            client-id:
-#            client-secret:
-#            scope:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 269339707834-ogp51le99ahmtmbbd7fltemn4cjh0a43.apps.googleusercontent.com
+            client-secret: ???
+            scope: profile, email
+
+jwt:
+  issuer: dalamz@dalamz.com
+  secret_key: ???
