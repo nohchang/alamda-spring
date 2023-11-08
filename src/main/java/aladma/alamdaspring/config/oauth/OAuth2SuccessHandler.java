@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -20,6 +21,7 @@ import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(14);
@@ -40,9 +42,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
 
-        String targetUrl = getTargetUrl(accessToken);
+//        String targetUrl = getTargetUrl(accessToken);
 
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, "/users/" + user.getId());
+
+        log.info("1");
+        log.info("oAuth2User={}", oAuth2User);
+        log.info("user={}", user);
+        log.info("user.getId()={}", user.getId());
+//        log.info("targetUrl={}", targetUrl);
     }
 
     private void saveRefreshToken(Long userId, String newRefreshToken) {

@@ -1,18 +1,20 @@
 package aladma.alamdaspring.controller;
 
+import aladma.alamdaspring.domain.RefreshToken;
 import aladma.alamdaspring.domain.User;
 import aladma.alamdaspring.dto.AddUserRequest;
 import aladma.alamdaspring.dto.AddUserResponse;
+import aladma.alamdaspring.dto.LoginResponse;
+import aladma.alamdaspring.service.RefreshTokenService;
 import aladma.alamdaspring.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserApiController {
 
     private final UserService userService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/users")
     public AddUserResponse saveUser(@RequestBody AddUserRequest request) {
@@ -35,6 +38,17 @@ public class UserApiController {
         return new AddUserResponse(id);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<LoginResponse> successLoginUser(@PathVariable("id") Long id) {
+
+        User user = userService.findById(id);
+
+        RefreshToken refreshToken = refreshTokenService.findByUserId(id);
+
+        return ResponseEntity.ok()
+                .body(new LoginResponse(user.getId(), user.getEmail(), user.getNickname(), refreshToken.getRefreshToken()));
+    }
+
     @GetMapping("/api/users")
     public Result findUsers() {
         List<User> findUsers = userService.findUsers();
@@ -43,7 +57,7 @@ public class UserApiController {
                 .map(m -> new UserDto(m.getEmail()))
                 .collect(Collectors.toList());
 
-        return new Result(collect.size(), collect);
+        return new Result<>(collect.size(), collect);
     }
 
     @Data
