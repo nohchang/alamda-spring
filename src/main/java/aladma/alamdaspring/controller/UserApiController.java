@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,7 +37,7 @@ public class UserApiController {
         return new AddUserResponse(id);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/api/users/{id}")
     public ResponseEntity<LoginResponse> successLoginUser(@PathVariable("id") Long id) {
 
         User user = userService.findById(id);
