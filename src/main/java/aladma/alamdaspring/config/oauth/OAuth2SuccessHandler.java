@@ -1,10 +1,10 @@
 package aladma.alamdaspring.config.oauth;
 
 import aladma.alamdaspring.config.jwt.TokenProvider;
-import aladma.alamdaspring.domain.RefreshToken;
+import aladma.alamdaspring.domain.JwtToken;
 import aladma.alamdaspring.domain.User;
 import aladma.alamdaspring.dto.LoginResponse;
-import aladma.alamdaspring.repository.RefreshTokenRepository;
+import aladma.alamdaspring.repository.JwtTokenRepository;
 import aladma.alamdaspring.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private static final String REDIRECT_PATH = "/signup";
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenRepository jwtTokenRepository;
     private final UserService userService;
 
     @Override
@@ -39,14 +39,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userService.findByEmail((String) oAuth2User.getAttributes().get("email"));
 
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);
-        saveRefreshToken(user.getId(), refreshToken);
-
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
+        saveJwtToken(user.getId(), accessToken, refreshToken);
 
 //        String fullAccessToken = "Bearer " + accessToken;
 //        response.setHeader("Authorization", fullAccessToken);
 
-        String jsonResponse = new ObjectMapper().writeValueAsString(new LoginResponse(user.getId(), user.getEmail(), user.getNickname(), refreshToken));
+        String jsonResponse = new ObjectMapper().writeValueAsString(new LoginResponse(user.getId(), user.getEmail(), user.getNickname(), accessToken, refreshToken));
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jsonResponse);
@@ -56,12 +55,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //        getRedirectStrategy().sendRedirect(request, response, "/api/users/" + user.getId());
     }
 
-    private void saveRefreshToken(Long userId, String newRefreshToken) {
-        RefreshToken refreshToken = refreshTokenRepository.findByUserId(userId)
-                .map(entity -> entity.update(newRefreshToken))
-                .orElse(new RefreshToken(userId, newRefreshToken));
+    private void saveJwtToken(Long userId, String accessToken, String newRefreshToken) {
+        JwtToken jwtToken = jwtTokenRepository.findByUserId(userId)
+                .map(entity -> entity.update(accessToken, newRefreshToken))
+                .orElse(new JwtToken(userId, accessToken,newRefreshToken));
 
-        refreshTokenRepository.save(refreshToken);
+        jwtTokenRepository.save(jwtToken);
     }
 
     private String getTargetUrl(String token) {

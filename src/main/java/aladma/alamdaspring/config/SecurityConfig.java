@@ -3,7 +3,7 @@ package aladma.alamdaspring.config;
 import aladma.alamdaspring.config.jwt.TokenProvider;
 import aladma.alamdaspring.config.oauth.OAuth2SuccessHandler;
 import aladma.alamdaspring.config.oauth.OAuth2UserCustomService;
-import aladma.alamdaspring.repository.RefreshTokenRepository;
+import aladma.alamdaspring.repository.JwtTokenRepository;
 import aladma.alamdaspring.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +23,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenRepository jwtTokenRepository;
     private final UserService userService;
     private final OAuth2UserCustomService oAuth2UserCustomService;
 
@@ -67,7 +67,7 @@ public class SecurityConfig {
 
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler() {
-        return new OAuth2SuccessHandler(tokenProvider, refreshTokenRepository, userService);
+        return new OAuth2SuccessHandler(tokenProvider, jwtTokenRepository, userService);
     }
 
     @Bean

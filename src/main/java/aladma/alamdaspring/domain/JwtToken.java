@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken {
+public class JwtToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,15 +18,20 @@ public class RefreshToken {
     @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
 
+    @Column(name = "access_token", nullable = false)
+    private String accessToken;
+
     @Column(name = "refresh_token", nullable = false)
     private String refreshToken;
 
-    public RefreshToken(Long userId, String refreshToken) {
+    public JwtToken(Long userId, String accessToken, String refreshToken) {
         this.userId = userId;
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
 
-    public RefreshToken update(String newRefreshToken) {
+    public JwtToken update(String accessToken, String newRefreshToken) {
+        this.accessToken = accessToken;
         this.refreshToken = newRefreshToken;
         return this;
     }

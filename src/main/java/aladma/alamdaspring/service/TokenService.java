@@ -12,7 +12,7 @@ import java.time.Duration;
 public class TokenService {
 
     private final TokenProvider tokenProvider;
-    private final RefreshTokenService refreshTokenService;
+    private final JwtTokenService jwtTokenService;
     private final UserService userService;
 
     public String createNewAccessToken(String refreshToken) {
@@ -20,7 +20,7 @@ public class TokenService {
             throw new IllegalArgumentException("Unexpected token");
         }
 
-        Long userId = refreshTokenService.findByRefreshToken(refreshToken).getUserId();
+        Long userId = jwtTokenService.findByRefreshToken(refreshToken).getUserId();
         User user = userService.findById(userId);
 
         return tokenProvider.generateToken(user, Duration.ofHours(2));

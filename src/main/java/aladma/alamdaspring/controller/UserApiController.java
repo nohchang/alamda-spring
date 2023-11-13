@@ -1,11 +1,11 @@
 package aladma.alamdaspring.controller;
 
-import aladma.alamdaspring.domain.RefreshToken;
+import aladma.alamdaspring.domain.JwtToken;
 import aladma.alamdaspring.domain.User;
 import aladma.alamdaspring.dto.AddUserRequest;
 import aladma.alamdaspring.dto.AddUserResponse;
 import aladma.alamdaspring.dto.LoginResponse;
-import aladma.alamdaspring.service.RefreshTokenService;
+import aladma.alamdaspring.service.JwtTokenService;
 import aladma.alamdaspring.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class UserApiController {
 
     private final UserService userService;
-    private final RefreshTokenService refreshTokenService;
+    private final JwtTokenService jwtTokenService;
 
     @PostMapping("/users")
     public AddUserResponse saveUser(@RequestBody AddUserRequest request) {
@@ -42,10 +42,10 @@ public class UserApiController {
 
         User user = userService.findById(id);
 
-        RefreshToken refreshToken = refreshTokenService.findByUserId(id);
+        JwtToken jwtToken = jwtTokenService.findByUserId(id);
 
         return ResponseEntity.ok()
-                .body(new LoginResponse(user.getId(), user.getEmail(), user.getNickname(), refreshToken.getRefreshToken()));
+                .body(new LoginResponse(user.getId(), user.getEmail(), user.getNickname(), jwtToken.getAccessToken(), jwtToken.getRefreshToken()));
     }
 
     @GetMapping("/api/users")
